@@ -1,12 +1,8 @@
-import os
-import sys
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.join(current_dir, '..')
-sys.path.append(root_dir)
-
-from database.database_utils import check_collection_exists
-from database.pg_connection import connect_to_postgres_vector_db
+from .db_utils import check_collection_exists
+from .pg_connection import connect_to_postgres_vector_db
+from langchain_postgres.vectorstores import PGVector
+from fastapi.exceptions import HTTPException
+from config import bedrock_embedding
 
 def initialize_db_retriever(collectionID, top_k, embeddings_model):
     try:
