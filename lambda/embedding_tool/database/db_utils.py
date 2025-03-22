@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from database.postgres_connection import connect_to_postgres_db
+from .pg_connection import connect_to_postgres_db
 def check_collection_exists(project_id):
     db_conn = connect_to_postgres_db()
     cur = db_conn.cursor()
