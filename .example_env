@@ -1,6 +1,3 @@
-DB_HOST = localhost
-DB_USER = postgres
-DB_NAME = BizGive
 PORT = 5432
 LLM_MODEL = "anthropic.claude-3-sonnet-20240229-v1:0"
 EMBEDDING_MODEL = "amazon.titan-embed-text-v2:0"

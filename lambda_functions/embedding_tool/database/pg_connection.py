@@ -40,7 +40,8 @@ def connect_to_postgres_db():
     """Connect to PostgreSQL Aurora with IAM authentication for structured data"""
     conn = None
     try:
-        token = "admin123"
+        token = generate_iam_auth_token()
+        # token = "admin123"
         print(token)
         conn = psycopg2.connect(
             host=DB_HOST,
@@ -48,7 +49,7 @@ def connect_to_postgres_db():
             password=token,
             dbname=DB_NAME,
             port=PORT,
-            # sslmode='require',
+            sslmode='require',
         )
         print("Structured database connection successful")
     except (Exception, psycopg2.DatabaseError) as error:
@@ -60,7 +61,8 @@ def connect_to_postgres_db():
 def connect_to_postgres_vector_db():
     """Connect to the PostgreSQL vector database (pgvector)"""
     try:
-        token = "admin123"
+        token = generate_iam_auth_token()
+        # token = "admin123"
         encoded_token = urllib.parse.quote(token)
         db_url = f"postgresql://{DB_USER}:{encoded_token}@{DB_HOST}:{PORT}/{DB_NAME}"
         
@@ -74,4 +76,4 @@ def connect_to_postgres_vector_db():
         print(f"An error occurred: {e}")
         return None
     
-connect_to_postgres_db()
+# connect_to_postgres_db()

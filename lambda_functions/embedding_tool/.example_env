@@ -1,1 +1,5 @@
 EMBEDDING_MODEL = "Embedding Model to use"
+DB_HOST = localhost
+DB_USER = postgres
+DB_NAME = BizGive
+PORT = 5432
