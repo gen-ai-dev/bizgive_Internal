@@ -76,4 +76,4 @@ def connect_to_postgres_vector_db():
         print(f"An error occurred: {e}")
         return None
     
-connect_to_postgres_db()
+# connect_to_postgres_db()
