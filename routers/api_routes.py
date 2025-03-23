@@ -4,9 +4,9 @@ import boto3
 import jwt
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
-from langchain_community.callbacks.manager import get_bedrock_anthropic_callback
 from dotenv import load_dotenv
 from datetime import datetime
+from lambda_functions import orchestrator_lambda
 
 load_dotenv()
 
@@ -68,16 +68,16 @@ async def responseflow(request: Request):
                  "classification_node":None,
                  "embedding_node":None,
                  "final_response":None,
-                 "projectCollectionId":projectCollection_id,
-                 "industryCollectionID":industryCollection_id
+                 "projectCollection_id":projectCollection_id,
+                 "industryCollection_id":industryCollection_id
                 }
-        
-        lambda_response = invoke_lambda(LAMBDA_FUNCTION_NAME, event)
-        final_output = lambda_response.get("final_output", "No response generated")
+        # lambda_response = invoke_lambda(LAMBDA_FUNCTION_NAME, event)
+        lambda_response = orchestrator_lambda({"input_text":event},None)
+        final_output = lambda_response.get("final_output")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return {"response": final_output, "timestamp": question_time}
+    return {"response": final_output}
 
 @router.post('/api/bgai/letterresflow')
 async def responseflow(request: Request, token: str = Depends(oauth2_scheme)):

@@ -1,0 +1,3 @@
+EXTRACTION_LAMBDA="Name of the classification lambda function"
+EMBEDDINGS_LAMBDA="Name of the embeddings lambda function"
+RESPONSE_LAMBDA="Name of the response lambda function"

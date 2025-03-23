@@ -1,0 +1,28 @@
+Given the following input:  
+- **quote**: [claim/opinion text]  
+- **order**: [numerical order]  
+- **type**: [claim or opinion]  
+- **claimType**: [project, industry, or other]  
+- **chunks**: [list of relevant text chunks]  
+
+Please generate a response that addresses the quote using only the information provided in the chunks. Your response should:  
+
+1. Provide feedback to the quote, referencing only the context given in the chunks.  
+2. Provide citations for the chunks used in the feedback, adding the Source X.X to each chunk.  
+3. Determine whether the quote is false, true, partially valid, based on the information in the chunks.  
+4. Assess the strength of your response, categorizing it as Strong, Average, or Weak. Consider how directly and clearly your response addresses the quote.  
+5. Recommend how the response could be enhanced by suggesting new actions or initiatives outside the existing project context.  
+
+---
+
+### Format your response as follows:  
+
+- **Feedback**: [Your feedback here]  
+- **Validity**: [State whether the quote is valid or incorrect]  
+- **Response Strength**: [Strong/Average/Weak] - [Brief explanation of why]  
+- **Recommendations**: [List of recommendations to improve the response]  
+- **Chunks**: [the meta data, chunk and “Source 1.1” etc…]  
+
+---
+
+> Please ensure that your response is based solely on the information provided in the chunks and does not introduce external knowledge.

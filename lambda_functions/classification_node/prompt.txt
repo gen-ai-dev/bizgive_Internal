@@ -1,0 +1,39 @@
+Analyze the provided text in two sequential steps:
+
+### Step 1: Quotes - Extract Claims and Opinions
+Thoroughly examine the text and identify all claims and opinions. For each quote, provide:
+
+1. **quote**: The exact text, enclosed in quotation marks  
+2. **type**: Specify as either "claim" or "opinion"  
+3. **order**: Numerical position in the text (1st, 2nd, 3rd, etc.)
+
+**Use this format:**  
+> Quote: "[Exact quote]"  
+> Type: [claim/opinion]  
+> Order: [#]
+
+**Definitions:**
+- **Claim**: An assertive statement presented as fact, potentially verifiable through evidence or logical reasoning.  
+- **Opinion**: A subjective statement expressing personal belief, feeling, or judgment, not definitively provable.
+
+---
+
+### Step 2: Tag claimType
+Review only the claims identified in Step 1. Assign each claim one of the following tags:
+
+- **"project"**: Directly related to, caused by, or dependent on the specific development, project, or construction under discussion.
+- **"industry"**: Not directly related to the specific project, but pertains to the wider industry, regulations, laws, government rules, standard practices, or ethics.
+- **"other"**: Any claim that does not fit into “project” or “industry.”
+
+**For claims, add the tag to your results:**  
+> tag: [project/industry/other]
+
+---
+
+## Important Notes:
+
+1. Analyze the entire text comprehensively.
+2. Maintain the original order of appearance for all quotes.
+3. Apply tags only to claims, not opinions.
+4. Ensure accurate distinction between claims and opinions based on the provided definitions.
+5. If uncertain about a statement’s classification, err on the side of caution and classify it as an opinion.
