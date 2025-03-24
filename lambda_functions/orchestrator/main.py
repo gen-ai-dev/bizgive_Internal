@@ -35,12 +35,12 @@ except Exception as e:
     raise
 
 # Validate environment variables
-# required_env_vars = ['EXTRACTION_LAMBDA', 'EMBEDDINGS_LAMBDA', 'RESPONSE_LAMBDA']
-# missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
-# if missing_vars:
-#     for var in missing_vars:
-#         logger.critical(ERR_MISSING_ENV_VAR.format(var))
-#     raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
+required_env_vars = ['EXTRACTION_LAMBDA', 'EMBEDDINGS_LAMBDA', 'RESPONSE_LAMBDA']
+missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
+if missing_vars:
+    for var in missing_vars:
+        logger.critical(ERR_MISSING_ENV_VAR.format(var))
+    raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
 
 FLOW_CONFIGS = {
     "respond": {
@@ -135,7 +135,7 @@ def embedding_node(state: State) -> State:
             return state
             
         response = invoke_lambda(FLOW_CONFIGS["respond"]["lambdas"]["embeddings"], {"input_text": state.classification_node,"collection_id":state.projectCollection_id,"projectCollection":state.projectCollection_id,"industryCollection":state.industryCollection_id})
-        # response = embedding_lambda({"input_text":state.classification_node},None)
+        # response = embedding_lambda({"input_text": state.classification_node,"collection_id":state.projectCollection_id,"projectCollection":state.projectCollection_id,"industryCollection":state.industryCollection_id},None)
             
         logger.info("Embedding node processing completed")
         return {"embedding_node":response}
@@ -225,9 +225,9 @@ def lambda_handler(event, context):
         logger.info("Orchastrator started")
                    
         input_text = event["input_text"]
-        
         # logger.info(f"Processing input: {input_text[:50]}{'...' if len(input_text) > 50 else ''}")
-        result_state = graph.invoke(input_text)
+        config = {"configurable": {"thread_id": event["query_id"]}}
+        result_state = graph.invoke(input_text,config=config)
         response_text = result_state["final_response"]
         
         logger.info("Lambda handler completed successfully")

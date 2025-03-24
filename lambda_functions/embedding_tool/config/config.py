@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from dotenv import load_dotenv
 from langchain_aws.embeddings import BedrockEmbeddings
 from langchain_aws import ChatBedrock
-
+from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
 
 # Configure logging
 logger = logging.getLogger("bedrock_configuration")
@@ -94,6 +94,7 @@ def bedrock_embedding(model_id: str):
         
         logger.info(f"Bedrock embeddings initialized with model: {model_id}")
         return embeddings
+        # return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
         
     except ValueError as e:
         logger.error(f"Invalid value for embeddings: {str(e)}")
