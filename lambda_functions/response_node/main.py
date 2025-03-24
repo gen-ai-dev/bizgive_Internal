@@ -71,8 +71,6 @@ def lambda_handler(event, context):
     try:
         # Extract and validate input text
         input_text = event.get("input_text")
-        print(input_text)
-        print(type(input_text))
         if not input_text:
             logger.warning("Empty received")
             raise HTTPException(

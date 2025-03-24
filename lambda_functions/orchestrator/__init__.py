@@ -1,1 +1,1 @@
-from .orchestrator import lambda_handler
+from .main import lambda_handler

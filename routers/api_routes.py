@@ -12,10 +12,9 @@ load_dotenv()
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-lambda_client = boto3.client('lambda', region_name=AWS_REGION)
-ORCHESTRATOR_LAMBDA_FUNCTION_NAME = os.getenv("ORCHESTRATOR_LAMBDA_FUNCTION_NAME", "your-lambda-function-name")
-LETTER_RES_LAMBDA_FUNCTION_NAME = os.getenv("LETTER_RES_LAMBDA_FUNCTION_NAME", "your-lambda-function-name")
+AWS_DEFAULT_REGION = os.getenv("AWS_REGION", "eu-west-2")
+lambda_client = boto3.client('lambda', region_name=AWS_DEFAULT_REGION)
+ORCHESTRATOR_LAMBDA_FUNCTION_NAME = os.getenv("ORCHESTRATOR_LAMBDA_FUNCTION_NAME")
 
 def invoke_lambda(function_name, payload):
     """Invoke an AWS Lambda function and return the response."""
@@ -52,6 +51,7 @@ async def responseflow(request: Request):
     question_time = datetime.now().strftime("%Y%m%d %H:%M:%S")
 
     # Extract parameters from request body
+    query_id = data.get('query_id')
     visitor_id = data.get('visitorID')
     asset_id = data.get('assetID')
     projectCollection_id = data.get('projectCollection')
@@ -69,47 +69,47 @@ async def responseflow(request: Request):
                  "embedding_node":None,
                  "final_response":None,
                  "projectCollection_id":projectCollection_id,
-                 "industryCollection_id":industryCollection_id
+                 "industryCollection_id":industryCollection_id,
                 }
-        # lambda_response = invoke_lambda(LAMBDA_FUNCTION_NAME, event)
-        lambda_response = orchestrator_lambda({"input_text":event},None)
+        lambda_response = invoke_lambda(ORCHESTRATOR_LAMBDA_FUNCTION_NAME, {"input_text":event,"query_id":query_id})
+        # lambda_response = orchestrator_lambda({"input_text":event,"query_id":query_id},None)
         final_output = lambda_response.get("final_output")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
     return {"response": final_output}
 
-@router.post('/api/bgai/letterresflow')
-async def responseflow(request: Request, token: str = Depends(oauth2_scheme)):
-    # Decode the JWT token
-    try:
-        payload = jwt.decode(token, options={"verify_signature": False})
-        custom_entity = payload.get('custom:entity') 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=403, detail="Invalid token")
+# @router.post('/api/bgai/letterresflow')
+# async def responseflow(request: Request, token: str = Depends(oauth2_scheme)):
+#     # Decode the JWT token
+#     try:
+#         payload = jwt.decode(token, options={"verify_signature": False})
+#         custom_entity = payload.get('custom:entity') 
+#     except jwt.ExpiredSignatureError:
+#         raise HTTPException(status_code=401, detail="Token has expired")
+#     except jwt.PyJWTError:
+#         raise HTTPException(status_code=403, detail="Invalid token")
 
-    # Check for the allowed custom entity
-    if custom_entity != "cePublic":
-        raise HTTPException(status_code=403, detail="You are not allowed to perform this operation")
+#     # Check for the allowed custom entity
+#     if custom_entity != "cePublic":
+#         raise HTTPException(status_code=403, detail="You are not allowed to perform this operation")
 
-    data = await request.json()
-    question_time = datetime.now().strftime("%Y%m%d %H:%M:%S")
+#     data = await request.json()
+#     question_time = datetime.now().strftime("%Y%m%d %H:%M:%S")
 
-    # Extract parameters from request body
-    visitor_id = data.get('visitorID')
-    question = data.get('text')
+#     # Extract parameters from request body
+#     visitor_id = data.get('visitorID')
+#     question = data.get('text')
 
-    # Check for missing parameters
-    # if not visitor_id or not asset_id or not project_id or not question:
-    #     raise HTTPException(status_code=400, detail="Missing required parameters")
+#     # Check for missing parameters
+#     # if not visitor_id or not asset_id or not project_id or not question:
+#     #     raise HTTPException(status_code=400, detail="Missing required parameters")
 
-    try:
-        event = {"input_text": question}
-        lambda_response = invoke_lambda(LETTER_RES_LAMBDA_FUNCTION_NAME, event)
-        final_output = lambda_response.get("final_output", "No response generated")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#     try:
+#         event = {"input_text": question}
+#         lambda_response = invoke_lambda(LETTER_RES_LAMBDA_FUNCTION_NAME, event)
+#         final_output = lambda_response.get("final_output", "No response generated")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
-    return {"response": final_output, "timestamp": question_time}    
+#     return {"response": final_output, "timestamp": question_time}    

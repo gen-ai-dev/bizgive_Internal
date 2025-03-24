@@ -125,10 +125,11 @@ def get_reference(query: str, collection_id:str, projectCollection:str,industryC
         
     except Exception as e:
         logger.error(f"Error retrieving references: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve references: {str(e)}"
-        )
+        # raise HTTPException(
+        #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #     detail=f"Failed to retrieve references: {str(e)}"
+        # )
+        context = []
 
 def lambda_handler(event, context):
     """
