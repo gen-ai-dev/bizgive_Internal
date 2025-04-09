@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 from datetime import datetime
-from lambda_functions import orchestrator_lambda
+# from lambda_functions import orchestrator_lambda
 
 load_dotenv()
 
@@ -32,7 +32,7 @@ def invoke_lambda(function_name, payload):
 
 
 # FastAPI route to handle POST request
-@router.post('/api/bgai/responseflow')
+@router.post('/api/bgai/apilambda')
 async def responseflow(request: Request):
     # # Decode the JWT token
     # try:
