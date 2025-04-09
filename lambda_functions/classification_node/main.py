@@ -78,7 +78,7 @@ def initialize_model():
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Claude model initialization failed")
 
 # Function to clean and extract valid JSON
-'''def extract_json(text):
+def extract_json(text):
     """Extracts a valid JSON string from Claude's response."""
     try:
         match = re.search(r"\{.*\}", text, re.DOTALL)  # Extract JSON-like text
@@ -88,7 +88,7 @@ def initialize_model():
         else:
             raise ValueError("No valid JSON found in response.")
     except json.JSONDecodeError as e:
-        raise ValueError(f"JSON decoding failed: {str(e)}")'''
+        raise ValueError(f"JSON decoding failed: {str(e)}")
 
 
 # Lambda Function Handler
