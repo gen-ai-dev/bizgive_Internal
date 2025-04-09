@@ -1,12 +1,16 @@
 import json
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Dict, List,Literal
 import os
 import sys
+import boto3
 import logging
 from fastapi import HTTPException, status
-from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
-from .config import initialize_llm
+from langchain_community.chat_models import BedrockChat
+from langchain_core.messages import AIMessage
+#from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
+from config import initialize_llm
+from langchain_aws import ChatBedrock
 
 ##setting up the logger
 logger = logging.getLogger("classification_service")
@@ -15,19 +19,41 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 logger.addHandler(console_handler)
 
+def initialize_model():
+    """Initialize and return the Bedrock Claude model."""
+    try:
+        # Create client with explicit region
+        bedrock_client = boto3.client("bedrock-runtime", region_name="eu-central-1")
+        
+        # Pass client to model but don't include region in model_kwargs
+        model = ChatBedrock(
+            client=bedrock_client,
+            model_id="anthropic.claude-3-5-sonnet-20240620-v1:0",
+            model_kwargs={} # Remove region from here
+        )
+        return model
+    except Exception as e:
+        # Log more specific AWS error details
+        logger.error(f"Failed to initialize Claude model: {str(e)}", exc_info=True)
+        if hasattr(e, "response"):
+            logger.error(f"AWS Error Response: {e.response}")
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Claude model initialization failed")
+
+
+
 
 class FinalResponse(BaseModel):
     feedback: str = Field(description="Detailed feedback about the response")
-    validity: Literal["valid", "Invalid"] = Field(description="Whether the quote is valid or invalid")
-    response_strength: Literal["Strong", "Average", "Weak"] = Field(description="Assessment of the response strength")
+    validity: str = Field(description="Whether the quote is valid or invalid")
+    response_strength: str = Field(description="Assessment of the response strength")
     strength_explanation: str = Field(description="Brief explanation of the response strength rating")
-    recommendations: List[str] = Field(description="List of recommendations to improve the response")
+    recommendations: str = Field(description="List of recommendations to improve the response")
     # chunks_list: List[Dict] = Field(description="Source chunks used for reference, including metadata")
 
 def load_system_prompt() -> str:
     """Load system prompt from file with error handling."""
     try:
-        file_path = r"lambda_functions\response_node\prompt.txt"
+        file_path = r"prompt.txt"
         with open(file_path, "rb") as file:
             return file.read()
     except FileNotFoundError:
@@ -43,7 +69,7 @@ def load_system_prompt() -> str:
             detail="System configuration error: failed to read prompt file"
         )
 
-def initialize_model():
+'''def initialize_model():
     """Initialize and return the language model with error handling."""
     try:
         # model = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
@@ -55,7 +81,7 @@ def initialize_model():
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to initialize language model"
-        )
+        )'''
 
 def lambda_handler(event, context):
     """
@@ -81,7 +107,7 @@ def lambda_handler(event, context):
         logger.info(f"Processing Embeddings and Extractor Output)")
         
         # Load system prompt
-        system_prompt = ""
+        system_prompt = load_system_prompt()
         model = initialize_model()
         final_prompt = f'''
                         [SYSTEM_PROMPT]
@@ -94,7 +120,8 @@ def lambda_handler(event, context):
             structured_llm = model.with_structured_output(FinalResponse)
             final_output = structured_llm.invoke(final_prompt)
             logger.info(f"Successfully the Extraction and Embeddings Outputs")
-            return final_output
+            logger.info(f"Final Output: {final_output}")
+            return str(final_output)
             
         except Exception as e:
             logger.error(f"Language model processing error: {str(e)}")
