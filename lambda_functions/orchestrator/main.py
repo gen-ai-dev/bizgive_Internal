@@ -11,12 +11,13 @@ import boto3
 from langgraph.graph import StateGraph, START, END
 import os
 import logging
-from .state import State
+from state import State
 import traceback
 from botocore.exceptions import ClientError
-from classification_node import lambda_handler as classification_lambda
-from embedding_tool import lambda_handler as embedding_lambda
-from response_node import lambda_handler as response_lambda
+#from classification_node import lambda_handler as classification_lambda
+#from embedding_tool import lambda_handler as embedding_lambda
+#from response_node import lambda_handler as response_lambda
+
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -109,6 +110,7 @@ def invoke_lambda(function_name, payload):
         raise
 
 def classification_node(state: State) -> State:
+    print(state.input_text)
     """Process the input text through the classification Lambda function."""
     try:
         logger.info("Starting classification node processing")
@@ -222,12 +224,27 @@ def lambda_handler(event, context):
         dict: The final output from the workflow
     """
     try:
-        logger.info("Orchastrator started")
-                   
+        '''logger.info("Orchastrator started")
+        query_id = event.get('query_id', '')      
+        question = event.get('text', '')        
+        project_collection = event.get('projectCollection', '')        
+        industry_collection = event.get('industryCollection', '')        
+        visitor_id = event.get('visitorID', '')        
+        asset_id = event.get('assetID', '')        
+        # Create a new dictionary with the same structure        
+        event_dict = {            
+                        "input_text": question,            
+                        "classification_node": None,            
+                        "embedding_node": None,            
+                        "final_response": None,            
+                        "projectCollection_id": "project_collection_id",            
+                        "industryCollection_id": "industry_collection_id"     
+                    }'''
         input_text = event["input_text"]
         # logger.info(f"Processing input: {input_text[:50]}{'...' if len(input_text) > 50 else ''}")
         config = {"configurable": {"thread_id": event["query_id"]}}
         result_state = graph.invoke(input_text,config=config)
+        print(result_state)
         response_text = result_state["final_response"]
         
         logger.info("Lambda handler completed successfully")
