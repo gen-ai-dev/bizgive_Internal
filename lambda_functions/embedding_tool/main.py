@@ -3,7 +3,7 @@ import logging
 from typing import Dict, List, Any, Optional
 import json
 from fastapi import HTTPException, status
-from .database.data_retrieval import initialize_db_retriever
+from database.data_retrieval import initialize_db_retriever
 import os
 # Configure logging
 logger = logging.getLogger("embedding_and_reference_service")
@@ -165,7 +165,7 @@ def lambda_handler(event, context):
                         continue
                         
                     logger.debug(f"Getting references for claim {i}: {claim['quote'][:50]}...")
-                    claim["context"] = get_reference(query=claim["quote"],projectCollection=projectCollection,collection_id=collection_id,industryCollection=industryCollection,type=claim["claim-type"])
+                    claim["context"] = str(get_reference(query=claim["quote"],projectCollection=projectCollection,collection_id=collection_id,industryCollection=industryCollection,type=claim["claim-type"]))
                     
                 except Exception as e:
                     logger.error(f"Error processing claim {i}: {str(e)}")
@@ -183,7 +183,7 @@ def lambda_handler(event, context):
                         continue
                         
                     logger.debug(f"Getting references for opinion {i}: {opinion['quote'][:50]}...")
-                    opinion["context"] = get_reference(opinion["quote"], projectCollection=projectCollection,collection_id=collection_id,industryCollection=industryCollection,type=None)
+                    opinion["context"] = str(get_reference(opinion["quote"], projectCollection=projectCollection,collection_id=collection_id,industryCollection=industryCollection,type=None))
                     
                 except Exception as e:
                     logger.error(f"Error processing opinion {i}: {str(e)}")
